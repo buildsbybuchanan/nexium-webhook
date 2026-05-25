@@ -1,16 +1,14 @@
-name: Webhook Health Check
+name: Manual Discord Test
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
 
 jobs:
-  webhook-health:
+  test-discord:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Test Discord webhook
+      - name: Send manual Discord test
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           REPOSITORY: ${{ github.repository }}
@@ -22,24 +20,17 @@ jobs:
             exit 1
           fi
 
-          PAYLOAD=$(cat <<JSON
-          {
-            "username": "Nexium Webhook",
-            "content": "Webhook health check passed.",
-            "embeds": [
-              {
-                "title": "Nexium Webhook Health Check",
-                "description": "Triggered by: ${ACTOR}\\nRepository: ${REPOSITORY}",
-                "url": "${RUN_URL}",
-                "color": 3066993
-              }
-            ]
-          }
-JSON
-          )
-
           curl -sS \
             -H "Content-Type: application/json" \
             -X POST \
-            -d "$PAYLOAD" \
+            -d "{
+              \"username\": \"Nexium Webhook\",
+              \"content\": \"Manual Discord test passed.\",
+              \"embeds\": [{
+                \"title\": \"Nexium Webhook Manual Test\",
+                \"description\": \"Triggered by: ${ACTOR}\\nRepository: ${REPOSITORY}\",
+                \"url\": \"${RUN_URL}\",
+                \"color\": 3066993
+              }]
+            }" \
             "$DISCORD_WEBHOOK_URL"
