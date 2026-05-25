@@ -8,29 +8,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Send manual Discord test
+      - name: Send Discord message
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           REPOSITORY: ${{ github.repository }}
           ACTOR: ${{ github.actor }}
-          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
         run: |
           if [ -z "$DISCORD_WEBHOOK_URL" ]; then
-            echo "DISCORD_WEBHOOK_URL is not configured."
+            echo "DISCORD_WEBHOOK_URL missing"
             exit 1
           fi
 
-          curl -sS \
-            -H "Content-Type: application/json" \
-            -X POST \
-            -d "{
-              \"username\": \"Nexium Webhook\",
-              \"content\": \"Manual Discord test passed.\",
-              \"embeds\": [{
-                \"title\": \"Nexium Webhook Manual Test\",
-                \"description\": \"Triggered by: ${ACTOR}\\nRepository: ${REPOSITORY}\",
-                \"url\": \"${RUN_URL}\",
-                \"color\": 3066993
-              }]
-            }" \
-            "$DISCORD_WEBHOOK_URL"
+          curl -H "Content-Type: application/json" \
+          -X POST \
+          -d "{
+            \"username\":\"Nexium Webhook\",
+            \"content\":\"GitHub Actions Discord webhook working.\",
+            \"embeds\":[
+              {
+                \"title\":\"Manual Discord Test\",
+                \"description\":\"Repository: ${REPOSITORY}\nTriggered by: ${ACTOR}\",
+                \"color\":3066993
+              }
+            ]
+          }" \
+          "$DISCORD_WEBHOOK_URL"
