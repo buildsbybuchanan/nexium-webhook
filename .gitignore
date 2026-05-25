@@ -1,0 +1,47 @@
+# Environment / secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+*.jks
+id_rsa
+id_ed25519
+secrets.json
+credentials
+credentials.json
+token.json
+service-account*.json
+firebase-adminsdk*.json
+
+# Dependencies
+node_modules/
+
+# Build / hosting
+dist/
+build/
+coverage/
+.vercel/
+.netlify/
+.railway/
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+*.gz
+*.rar
+*.7z
+
+# Logs
+logs/
+*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

@@ -1,0 +1,56 @@
+name: Repository Event Notifications
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  issues:
+    types: [opened, closed, reopened]
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send repository event to Discord
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          EVENT_NAME: ${{ github.event_name }}
+          REPOSITORY: ${{ github.repository }}
+          ACTOR: ${{ github.actor }}
+          REF_NAME: ${{ github.ref_name }}
+          COMMIT_SHA: ${{ github.sha }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ -z "$DISCORD_WEBHOOK_URL" ]; then
+            echo "No Discord webhook configured. Skipping notification."
+            exit 0
+          fi
+
+          SHORT_SHA="${COMMIT_SHA:0:7}"
+
+          PAYLOAD=$(cat <<JSON
+          {
+            "username": "Nexium Webhook",
+            "content": "Repository event detected.",
+            "embeds": [
+              {
+                "title": "${EVENT_NAME} on ${REPOSITORY}",
+                "description": "Actor: ${ACTOR}\\nBranch: ${REF_NAME}\\nCommit: ${SHORT_SHA}",
+                "url": "${RUN_URL}",
+                "color": 3447003
+              }
+            ]
+          }
+JSON
+          )
+
+          curl -sS \
+            -H "Content-Type: application/json" \
+            -X POST \
+            -d "$PAYLOAD" \
+            "$DISCORD_WEBHOOK_URL"
